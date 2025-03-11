@@ -91,7 +91,7 @@ class WillingManager:
         
         # 检查群组权限（如果是群聊）
         if chat_stream.group_info:                
-            if chat_stream.group_info.group_id in config.talk_frequency_down_groups:
+            if not is_mentioned_bot and chat_stream.group_info.group_id in config.talk_frequency_down_groups:
                 reply_probability = reply_probability / global_config.down_frequency_rate
 
         reply_probability = min(reply_probability, 1)
