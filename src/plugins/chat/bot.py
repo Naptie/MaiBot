@@ -152,7 +152,7 @@ class ChatBot:
         await self.storage.store_message(message, chat, topic[0] if topic else None)
 
         is_mentioned = is_mentioned_bot_in_message(message)
-        reply_probability = await willing_manager.change_reply_willing_received(
+        reply_probability, do_reply = await willing_manager.change_reply_willing_received(
             chat_stream=chat,
             topic=topic[0] if topic else None,
             is_mentioned_bot=is_mentioned,
@@ -169,7 +169,7 @@ class ChatBot:
 
         response = None
 
-        if random() < reply_probability:
+        if do_reply:
             bot_user_info = UserInfo(
                 user_id=global_config.BOT_QQ,
                 user_nickname=global_config.BOT_NICKNAME,
