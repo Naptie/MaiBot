@@ -17,6 +17,7 @@ from ..models.utils_model import LLM_request
 from .config import global_config
 from .mapper import emojimapper
 from .message_base import Seg
+from .utils_image import image_path_to_base64
 from .utils_user import get_user_nickname,get_groupname
 from .message_base import GroupInfo, UserInfo
 
@@ -375,17 +376,9 @@ class CQCode_tool:
         Returns:
             表情包CQ码字符串
         """
-        # 确保使用绝对路径
-        abs_path = os.path.abspath(file_path)
-        # 转义特殊字符
-        escaped_path = (
-            abs_path.replace("&", "&amp;")
-            .replace("[", "&#91;")
-            .replace("]", "&#93;")
-            .replace(",", "&#44;")
-        )
+        base64_data = image_path_to_base64(file_path)
         # 生成CQ码，设置sub_type=1表示这是表情包
-        return f"[CQ:image,file=file:///{escaped_path},sub_type=1]"
+        return f"[CQ:image,file=base64://{base64_data},sub_type=1]"
 
     @staticmethod
     def create_emoji_cq_base64(base64_data: str) -> str:
