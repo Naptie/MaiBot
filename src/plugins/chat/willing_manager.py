@@ -28,9 +28,8 @@ class WillingManager:
             await asyncio.sleep(5)
             for chat_id in self.chat_reply_willing:
                 self.chat_reply_willing[chat_id] = max(0, self.chat_reply_willing[chat_id] * 0.6)
-            for chat_id in self.chat_reply_willing:
-                self.chat_reply_willing[chat_id] = max(0, self.chat_reply_willing[chat_id] * 0.6)
-                
+
+
     def get_willing(self,chat_stream:ChatStream) -> float:
         """获取指定聊天流的回复意愿"""
         stream = chat_stream
@@ -38,9 +37,6 @@ class WillingManager:
             return self.chat_reply_willing.get(stream.stream_id, 0)
         return 0
     
-    def set_willing(self, chat_id: str, willing: float):
-        """设置指定聊天流的回复意愿"""
-        self.chat_reply_willing[chat_id] = willing
     def set_willing(self, chat_id: str, willing: float):
         """设置指定聊天流的回复意愿"""
         self.chat_reply_willing[chat_id] = willing
@@ -63,15 +59,12 @@ class WillingManager:
         if is_mentioned_bot and current_willing < 1.0:
             current_willing += 0.9
             logger.debug(f"被提及, 当前意愿: {current_willing}")
-            logger.debug(f"被提及, 当前意愿: {current_willing}")
         elif is_mentioned_bot:
             current_willing += 0.05
-            logger.debug(f"被重复提及, 当前意愿: {current_willing}")
             logger.debug(f"被重复提及, 当前意愿: {current_willing}")
         
         if is_emoji:
             current_willing *= 0.1
-            logger.debug(f"表情包, 当前意愿: {current_willing}")
             logger.debug(f"表情包, 当前意愿: {current_willing}")
         
         logger.debug(f"放大系数 interested_rate: {global_config.response_interested_rate_amplifier}")
@@ -133,10 +126,6 @@ class WillingManager:
         """更新最后回复时间"""
         self.chat_last_reply_time[chat_id] = datetime.now().timestamp()
 
-
-    def update_last_reply_time(self, chat_id: str):
-        """更新最后回复时间"""
-        self.chat_last_reply_time[chat_id] = datetime.now().timestamp()
 
     async def ensure_started(self):
         """确保衰减任务已启动"""
