@@ -77,11 +77,11 @@ class WillingManager:
         current_willing *= global_config.response_willing_amplifier #放大回复意愿
         # print(f"放大系数_willing: {global_config.response_willing_amplifier}, 当前意愿: {current_willing}")
 
-        x = datetime.now().timestamp() - self.group_last_reply_time.get(chat_id, 0)
+        x = datetime.now().timestamp() - self.chat_last_reply_time.get(chat_id, 0)
         rate_limit_factor = (
             math.atan(
                 (x - 40) / 3
-                if chat_stream.group_info and chat_id in config.talk_frequency_down_groups
+                if chat_stream.group_info and chat_stream.group_info.group_id in config.talk_frequency_down_groups
                 else (x - 10) / 3
             )
             / math.pi
@@ -125,7 +125,7 @@ class WillingManager:
 
     def update_last_reply_time(self, chat_id: str):
         """更新最后回复时间"""
-        self.group_last_reply_time[chat_id] = datetime.now().timestamp()
+        self.chat_last_reply_time[chat_id] = datetime.now().timestamp()
 
     async def ensure_started(self):
         """确保衰减任务已启动"""

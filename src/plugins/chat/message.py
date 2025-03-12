@@ -314,6 +314,7 @@ class MessageSending(MessageProcessBase):
         reply: Optional["MessageRecv"] = None,
         is_head: bool = False,
         is_emoji: bool = False,
+        is_mentioned_resp: bool = False,
     ):
         # 调用父类初始化
         super().__init__(
@@ -329,6 +330,7 @@ class MessageSending(MessageProcessBase):
         self.reply_to_message_id = reply.message_info.message_id if reply else None
         self.is_head = is_head
         self.is_emoji = is_emoji
+        self.is_mentioned_resp = is_mentioned_resp
 
     def set_reply(self, reply: Optional["MessageRecv"]) -> None:
         """设置回复消息"""

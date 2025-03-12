@@ -234,6 +234,7 @@ class ChatBot:
                     reply=message,
                     is_head=not mark_head,
                     is_emoji=False,
+                    is_mentioned_resp=is_mentioned,
                 )
                 print(f"bot_message: {bot_message}")
                 if not mark_head:
@@ -274,6 +275,7 @@ class ChatBot:
                         reply=message,
                         is_head=False,
                         is_emoji=True,
+                        is_mentioned_resp=is_mentioned,
                     )
                     message_manager.add_message(bot_message)
 
