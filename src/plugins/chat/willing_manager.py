@@ -2,6 +2,9 @@ import asyncio
 from datetime import datetime
 import math
 from random import random
+from datetime import datetime
+import math
+from random import random
 from typing import Dict
 
 from loguru import logger
@@ -55,17 +58,20 @@ class WillingManager:
         chat_id = stream.stream_id
         
         current_willing = self.chat_reply_willing.get(chat_id, 0)
-        
+
         # print(f"初始意愿: {current_willing}")
         if is_mentioned_bot and current_willing < 1.0:
             current_willing += 0.9
             logger.debug(f"被提及, 当前意愿: {current_willing}")
+            logger.debug(f"被提及, 当前意愿: {current_willing}")
         elif is_mentioned_bot:
             current_willing += 0.05
+            logger.debug(f"被重复提及, 当前意愿: {current_willing}")
             logger.debug(f"被重复提及, 当前意愿: {current_willing}")
         
         if is_emoji:
             current_willing *= 0.1
+            logger.debug(f"表情包, 当前意愿: {current_willing}")
             logger.debug(f"表情包, 当前意愿: {current_willing}")
         
         logger.debug(f"放大系数 interested_rate: {global_config.response_interested_rate_amplifier}")
@@ -94,7 +100,7 @@ class WillingManager:
         
         # 检查群组权限（如果是群聊）
         if chat_stream.group_info:                
-            if chat_stream.group_info.group_id in config.talk_frequency_down_groups:
+            if not is_mentioned_bot and chat_stream.group_info.group_id in config.talk_frequency_down_groups:
                 reply_probability = reply_probability / global_config.down_frequency_rate
 
         reply_probability = min(reply_probability, 1)
@@ -122,6 +128,11 @@ class WillingManager:
             current_willing = self.chat_reply_willing.get(stream.stream_id, 0)
             if current_willing < 1:
                 self.chat_reply_willing[stream.stream_id] = min(1, current_willing + 0.2)
+
+    def update_last_reply_time(self, chat_id: str):
+        """更新最后回复时间"""
+        self.chat_last_reply_time[chat_id] = datetime.now().timestamp()
+
 
     def update_last_reply_time(self, chat_id: str):
         """更新最后回复时间"""

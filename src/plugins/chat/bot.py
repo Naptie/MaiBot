@@ -279,6 +279,8 @@ class ChatBot:
                     )
                     message_manager.add_message(bot_message)
 
+            willing_manager.update_last_reply_time(chat.stream_id)
+
             emotion = await self.gpt._get_emotion_tags(raw_content)
             logger.debug(f"为 '{response}' 获取到的情感标签为：{emotion}")
             valuedict = {
