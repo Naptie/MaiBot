@@ -15,6 +15,8 @@ from loguru import logger
 import jieba
 from pypinyin import Style, pinyin
 
+from loguru import logger
+
 
 class ChineseTypoGenerator:
     def __init__(self, 
