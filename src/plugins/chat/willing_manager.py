@@ -1,5 +1,4 @@
 import asyncio
-from datetime import datetime
 import math
 import random
 import time
@@ -14,7 +13,6 @@ from .chat_stream import ChatStream
 class WillingManager:
     def __init__(self):
         self.chat_reply_willing: Dict[str, float] = {}  # 存储每个聊天流的回复意愿
-        self.chat_last_reply_time: Dict[str, float] = {}  # 存储每个聊天流的最后回复时间
         self.chat_high_willing_mode: Dict[str, bool] = {}  # 存储每个聊天流是否处于高回复意愿期
         self.chat_msg_count: Dict[str, int] = {}  # 存储每个聊天流接收到的消息数量
         self.chat_last_mode_change: Dict[str, float] = {}  # 存储每个聊天流上次模式切换的时间
@@ -155,7 +153,7 @@ class WillingManager:
         
         # 特殊情况处理
         if is_mentioned_bot:
-            current_willing += 0.5
+            current_willing += 0.8
             in_conversation_context = True
             self.chat_conversation_context[chat_id] = True
             logger.debug(f"被提及, 当前意愿: {current_willing}")
@@ -185,7 +183,7 @@ class WillingManager:
         # 考虑回复意愿的影响
         reply_probability = base_probability * current_willing
 
-        x = datetime.now().timestamp() - self.chat_last_reply_time.get(chat_id, 0)
+        x = time.time() - self.chat_last_reply_time.get(chat_id, 0)
         rate_limit_factor = (
             math.atan(
                 (x - 40) / 3
@@ -268,7 +266,7 @@ class WillingManager:
         
     def update_last_reply_time(self, chat_id: str):
         """更新最后回复时间"""
-        self.chat_last_reply_time[chat_id] = datetime.now().timestamp()
+        self.chat_last_reply_time[chat_id] = time.time()
 
 
     async def ensure_started(self):
