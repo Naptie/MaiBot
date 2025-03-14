@@ -27,6 +27,7 @@ class Message(MessageBase):
     reply: Optional["Message"] = None
     detailed_plain_text: str = ""
     processed_plain_text: str = ""
+    memorized_times: int = 0
 
     def __init__(
         self,
@@ -326,7 +327,7 @@ class MessageSending(MessageProcessBase):
             self.message_segment = Seg(
                 type="seglist",
                 data=[
-                    Seg(type="reply", data=reply.message_info.message_id),
+                    Seg(type="reply", data=self.reply.message_info.message_id),
                     self.message_segment,
                 ],
             )
