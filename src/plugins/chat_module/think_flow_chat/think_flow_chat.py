@@ -1,7 +1,8 @@
+import math
 import time
 from random import random
 import traceback
-from typing import List
+from typing import Dict, List
 from ...memory_system.Hippocampus import HippocampusManager
 from ...moods.moods import MoodManager
 from ...config.config import global_config
@@ -39,6 +40,7 @@ class ThinkFlowChat:
         self.mood_manager = MoodManager.get_instance()
         self.mood_manager.start_mood_update()
         self.tool_user = ToolUser()
+        self.chat_last_reply_time: Dict[str, float] = {}
 
     async def _create_thinking_message(self, message, chat, userinfo, messageinfo):
         """创建思考消息"""
@@ -172,7 +174,7 @@ class ThinkFlowChat:
         heartflow.create_subheartflow(chat.stream_id)
 
         await message.process()
-        logger.trace(f"消息处理成功{message.processed_plain_text}")
+        logger.trace(f"消息处理成功：{message.processed_plain_text}")
 
         # 过滤词/正则表达式过滤
         if self._check_ban_words(message.processed_plain_text, chat, userinfo) or self._check_ban_regex(
@@ -221,6 +223,18 @@ class ThinkFlowChat:
             if message.message_info.additional_config:
                 if "maimcore_reply_probability_gain" in message.message_info.additional_config.keys():
                     reply_probability += message.message_info.additional_config["maimcore_reply_probability_gain"]
+
+        x = time.time() - self.chat_last_reply_time.get(chat.group_info.group_id, 0)
+        rate_limit_factor = (
+            math.atan(
+                (x - 50) / 3
+                if chat.group_info.group_id in global_config.talk_frequency_down_groups
+                else (x - 10) / 3
+            )
+            / math.pi
+            + 0.5
+        )
+        reply_probability *= rate_limit_factor
 
         # 打印消息信息
         mes_name = chat.group_info.group_name if chat.group_info else "私聊"
@@ -389,6 +403,7 @@ class ThinkFlowChat:
                     logger.error(f"心流思考后脑内状态更新失败: {e}")
 
                 # 回复后处理
+                self.chat_last_reply_time[chat.group_info.group_id] = time.time()
                 await willing_manager.after_generate_reply_handle(message.message_info.message_id)
 
             except Exception as e:
